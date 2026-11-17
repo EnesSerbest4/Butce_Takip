@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const { Transaction, Account, Category, sequelize } = require('../models');
 
 // Yeni Gelir veya Gider İşlemi Ekle (Bakiyeyi Otomatik Günceller)
@@ -64,14 +65,37 @@ exports.createTransaction = async (req, res) => {
   }
 };
 
-// Kullanıcının Tüm İşlemlerini Listele (Hesap ve Kategori Bilgileriyle)
+// Kullanıcının İşlemlerini Filtreli Listele (Tarih, Hesap, Kategori, Tür)
 exports.getTransactions = async (req, res) => {
   try {
+    const { accountId, categoryId, tur, baslangicTarihi, bitisTarihi } = req.query;
+
+    const whereKosulu = { userId: req.user.id };
+    const categoryWhere = {};
+
+    if (accountId) whereKosulu.accountId = accountId;
+    if (categoryId) whereKosulu.categoryId = categoryId;
+    if (tur) categoryWhere.tur = tur;
+
+    if (baslangicTarihi && bitisTarihi) {
+      whereKosulu.tarih = {
+        [Op.between]: [new Date(baslangicTarihi), new Date(bitisTarihi)]
+      };
+    } else if (baslangicTarihi) {
+      whereKosulu.tarih = { [Op.gte]: new Date(baslangicTarihi) };
+    } else if (bitisTarihi) {
+      whereKosulu.tarih = { [Op.lte]: new Date(bitisTarihi) };
+    }
+
     const islemler = await Transaction.findAll({
-      where: { userId: req.user.id },
+      where: whereKosulu,
       include: [
         { model: Account, attributes: ['id', 'hesapAdi'] },
-        { model: Category, attributes: ['id', 'kategoriAdi', 'tur'] }
+        {
+          model: Category,
+          attributes: ['id', 'kategoriAdi', 'tur'],
+          where: Object.keys(categoryWhere).length ? categoryWhere : undefined
+        }
       ],
       order: [['tarih', 'DESC']]
     });
