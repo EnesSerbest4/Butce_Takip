@@ -9,6 +9,7 @@ const accountRoutes = require('./routes/accountRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,6 +27,10 @@ app.use('/api/dashboard', dashboardRoutes);
 app.get('/', (req, res) => {
   res.json({ message: "Kisisel Butce ve Harcama Takibi API Calisiyor" });
 });
+
+// Hata Yakalama Katmanları (Rotalardan sonra gelmeli)
+app.use(notFound);
+app.use(errorHandler);
 
 sequelize.sync({ alter: true })
   .then(async () => {
