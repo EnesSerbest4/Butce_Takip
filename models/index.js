@@ -4,7 +4,6 @@ const Account = require('./Account');
 const Category = require('./Category');
 const Transaction = require('./Transaction');
 
-// İlişkiler (Foreign Keys)
 User.hasMany(Account, { foreignKey: 'userId', onDelete: 'CASCADE' });
 Account.belongsTo(User, { foreignKey: 'userId' });
 
