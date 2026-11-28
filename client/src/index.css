@@ -276,3 +276,129 @@ body {
   color: #6b7280;
   font-size: 0.92rem;
 }
+/* Dashboard Özet Kartları */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary-card {
+  background: #ffffff;
+  padding: 1.25rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-left: 4px solid #2563eb;
+}
+
+.summary-card span {
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.summary-card h3 {
+  margin-top: 0.4rem;
+  font-size: 1.35rem;
+  color: #111827;
+}
+
+.summary-card.balance {
+  border-left-color: #2563eb;
+}
+
+.summary-card.income {
+  border-left-color: #16a34a;
+}
+
+.summary-card.expense {
+  border-left-color: #dc2626;
+}
+
+.summary-card.net {
+  border-left-color: #7c3aed;
+}
+
+/* İşlem Geçmişi Listesi */
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  gap: 0.75rem;
+}
+
+.tr-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tr-account {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.tr-meta {
+  font-size: 0.82rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.tr-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.badge-income {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.badge-expense {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.amount-income {
+  color: #15803d;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.amount-expense {
+  color: #b91c1c;
+  font-weight: 700;
+  white-space: nowrap;
+}
