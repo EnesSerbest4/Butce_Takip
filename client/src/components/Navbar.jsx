@@ -30,6 +30,12 @@ const Navbar = () => {
         >
           Hesaplarım
         </Link>
+        <Link
+          to="/categories"
+          className={location.pathname === '/categories' ? 'active' : ''}
+        >
+          Kategoriler
+        </Link>
       </div>
 
       <div className="navbar-user">

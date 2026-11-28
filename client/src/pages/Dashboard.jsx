@@ -21,6 +21,10 @@ const Dashboard = () => {
   const [categoryId, setCategoryId] = useState('');
   const [tarih, setTarih] = useState(new Date().toISOString().split('T')[0]);
 
+  // İşlem Geçmişi Filtre State'leri
+  const [filterTur, setFilterTur] = useState('tumu');
+  const [filterCategoryId, setFilterCategoryId] = useState('tumu');
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -33,13 +37,11 @@ const Dashboard = () => {
         api.get('/transactions')
       ]);
 
-      // Backend'den gelen "ozet" nesnesini al
       setSummary(summaryRes.data.ozet || summaryRes.data);
       setAccounts(accRes.data);
       setCategories(catRes.data);
       setTransactions(transRes.data);
 
-      // Varsayılan ilk hesabı seçili getir
       if (accRes.data.length > 0 && !accountId) {
         setAccountId(accRes.data[0].id);
       }
@@ -54,10 +56,8 @@ const Dashboard = () => {
     fetchAllData();
   }, []);
 
-  // Seçilen türe (gelir/gider) göre kategorileri filtrele
   const filteredCategories = categories.filter((cat) => cat.tur === tur);
 
-  // Tür değiştiğinde uygun ilk kategoriyi otomatik seç
   useEffect(() => {
     if (filteredCategories.length > 0) {
       setCategoryId(filteredCategories[0].id);
@@ -102,6 +102,15 @@ const Dashboard = () => {
       setError(err.response?.data?.message || 'İşlem silinemedi.');
     }
   };
+
+  // İşlem geçmişini seçili filtrelere göre süz
+  const displayedTransactions = transactions.filter((tr) => {
+    const islemTuru = tr.Category?.tur || 'gider';
+    const turUyumu = filterTur === 'tumu' || islemTuru === filterTur;
+    const kategoriUyumu =
+      filterCategoryId === 'tumu' || String(tr.categoryId) === String(filterCategoryId);
+    return turUyumu && kategoriUyumu;
+  });
 
   const formatMoney = (val) =>
     parseFloat(val || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' ₺';
@@ -217,16 +226,38 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Son İşlemler Listesi */}
+          {/* Son İşlemler Listesi ve Filtre Çubuğu */}
           <div className="card">
-            <h3>İşlem Geçmişi ({transactions.length})</h3>
+            <div className="list-header-row">
+              <h3>İşlem Geçmişi ({displayedTransactions.length})</h3>
+              <div className="filter-bar">
+                <select value={filterTur} onChange={(e) => setFilterTur(e.target.value)}>
+                  <option value="tumu">Tüm Türler</option>
+                  <option value="gelir">Sadece Gelir</option>
+                  <option value="gider">Sadece Gider</option>
+                </select>
+
+                <select
+                  value={filterCategoryId}
+                  onChange={(e) => setFilterCategoryId(e.target.value)}
+                >
+                  <option value="tumu">Tüm Kategoriler</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.kategoriAdi}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             {loading ? (
               <p>Yükleniyor...</p>
-            ) : transactions.length === 0 ? (
-              <p className="empty-text">Henüz kaydedilmiş bir gelir veya gider işlemi yok.</p>
+            ) : displayedTransactions.length === 0 ? (
+              <p className="empty-text">Seçilen filtreye uygun işlem kaydı bulunamadı.</p>
             ) : (
               <div className="transaction-list">
-                {transactions.map((tr) => {
+                {displayedTransactions.map((tr) => {
                   const islemTuru = tr.Category?.tur || 'gider';
                   return (
                     <div key={tr.id} className="transaction-item">
